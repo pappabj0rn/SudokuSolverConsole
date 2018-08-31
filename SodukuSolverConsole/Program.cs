@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace SudokuSolverConsole
 {
@@ -21,18 +22,31 @@ namespace SudokuSolverConsole
             const string borderMiddle = "├───┼───┼───┤";
             const string borderBottom = "└───┴───┴───┘";
             // └ ┴ ┼ ─ ┘┌ ┬ ─ ┐ |
-            for (var x = 0; x < PlayingField.Width; x++)
+
+            Console.WriteLine(borderTop);  
+
+            for (var y = 0; y < PlayingField.Height; y++)
             {
-                var rowNumbers = field.GetRow(x);
-                var row = "";
-                for (var y = 0; y < PlayingField.Height; y++)
-                {
-                    row += field.Squares[x, y].Value != 0 
-                        ? field.Squares[x, y].Value.ToString() 
-                        : " ";
-                }    
+                if(y>0 && y%3==0)
+                    Console.WriteLine(borderMiddle);
+
+                var rowNumbers = field.GetRow(y).Select(x=>x.Value > 0 ? x.Value.ToString() : " ").ToArray();
+                var row = string.Format(borderRow,
+                    rowNumbers[0],
+                    rowNumbers[1],
+                    rowNumbers[2],
+                    rowNumbers[3],
+                    rowNumbers[4],
+                    rowNumbers[5],
+                    rowNumbers[6],
+                    rowNumbers[7],
+                    rowNumbers[8]
+                    );
+
                 Console.WriteLine(row);
             }
+
+            Console.WriteLine(borderBottom);
         }
     }
 }
