@@ -20,9 +20,9 @@ namespace SudokuSolverConsoleTestUnit
             public void Should_set_square_values_from_input_string()
             {
                 var i = 0;
-                for (var x = 0; x < PlayingField.Width; x++)
+                for (var y = 0; y < PlayingField.Width; y++)
                 {
-                    for (var y = 0; y < PlayingField.Height; y++)
+                    for (var x = 0; x < PlayingField.Height; x++)
                     {
                         Assert.Equal(
                             int.Parse(FieldDefinition[i].ToString()),

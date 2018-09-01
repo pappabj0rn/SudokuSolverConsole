@@ -2,7 +2,7 @@
 
 namespace SudokuSolverConsole
 {
-    public class PlayingField
+    public class PlayingField : IPlayingField
     {
         public const int Width = 9;
         public const int Height = 9;
@@ -13,9 +13,9 @@ namespace SudokuSolverConsole
         {
             var i = 0;
             Squares = new Square[Width,Height];
-            for (var x = 0; x < Width; x++)
+            for (var y = 0; y < Height; y++)
             {
-                for (var y = 0; y < Height; y++)
+                for (var x = 0; x < Width; x++)
                 {
                     Squares[x,y] = new Square(int.Parse(s[i].ToString()));
                     i++;
@@ -23,11 +23,11 @@ namespace SudokuSolverConsole
             }
         }
 
-        public List<Square> GetRow(int x)
+        public List<Square> GetRow(int y)
         {
             var row = new List<Square>();
 
-            for (var y = 0; y < Width; y++)
+            for (var x = 0; x < Width; x++)
             {
                 row.Add(Squares[x,y]);
             }
@@ -35,11 +35,11 @@ namespace SudokuSolverConsole
             return row;
         }
 
-        public List<Square> GetColumn(int y)
+        public List<Square> GetColumn(int x)
         {
             var col = new List<Square>();
 
-            for (var x = 0; x < Height; x++)
+            for (var y = 0; y < Height; y++)
             {
                 col.Add(Squares[x,y]);
             }
@@ -50,12 +50,12 @@ namespace SudokuSolverConsole
         public List<Square> GetBigSquare(int i)
         {
             var bigSquare = new List<Square>();
-            var xOffset = i/3*BigSquareSize;
-            var yOffset = i%3*BigSquareSize;
+            var xOffset = i%3*BigSquareSize;
+            var yOffset = i / 3 * BigSquareSize;
 
-            for (var x = 0; x < BigSquareSize; x++)
+            for (var y = 0; y < BigSquareSize; y++)
             {
-                for (var y = 0; y < BigSquareSize; y++)
+                for (var x = 0; x < BigSquareSize; x++)
                 {
                     bigSquare.Add(Squares[x+xOffset,y+yOffset]);
                 }

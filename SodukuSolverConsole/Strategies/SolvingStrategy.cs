@@ -2,6 +2,6 @@
 {
     public abstract class SolvingStrategy
     {
-        
+        public abstract bool TrySolve(IPlayingField field);
     }
 }
