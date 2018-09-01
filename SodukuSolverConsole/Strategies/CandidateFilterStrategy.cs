@@ -1,12 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SudokuSolverConsole.Strategies
 {
-    public class CandidateRowFilterStrategy : SolvingStrategy
+    public class CandidateFilterStrategy : SolvingStrategy
     {
-        public override bool TrySolve(IPlayingField field)
+        public override List<Square> TrySolve(IPlayingField field)
         {
-            var removedCandidate = false;
+            var modifiedSquares = new List<Square>();
             for (var y = 0; y < PlayingField.Height; y++)
             {
                 var rowSquares = field.GetRow(y);
@@ -20,12 +21,12 @@ namespace SudokuSolverConsole.Strategies
                     foreach (var square in rowSquares.Where(x => x.Candidates != null))
                     {
                         if (square.Candidates.Remove(number))
-                            removedCandidate = true;
+                            modifiedSquares.Add(square);
                     }
                 }
             }
 
-            return removedCandidate;
+            return modifiedSquares;
         }
     }
 }

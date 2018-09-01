@@ -1,7 +1,9 @@
-﻿namespace SudokuSolverConsole.Strategies
+﻿using System.Collections.Generic;
+
+namespace SudokuSolverConsole.Strategies
 {
     public abstract class SolvingStrategy
     {
-        public abstract bool TrySolve(IPlayingField field);
+        public abstract List<Square> TrySolve(IPlayingField field);
     }
 }
