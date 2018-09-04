@@ -31,6 +31,19 @@ namespace SudokuSolverConsoleTestUnit
                     }    
                 }
             }
+
+            [Fact]
+            public void Should_set_square_meta_to_x_and_y_coordinates()
+            {
+                for (var y = 0; y < PlayingField.Height; y++)
+                {
+                    for (var x = 0; x < PlayingField.Width; x++)
+                    {
+                        Assert.Equal($"{x},{y}",field.Squares[x,y].Meta);
+                    }
+                    
+                }
+            }
         }
 
         public class GetRow : PlayingFieldTests

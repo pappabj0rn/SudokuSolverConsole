@@ -49,6 +49,14 @@ namespace SudokuSolverConsoleTestUnit
                 Assert.Equal(0,square.Value);
                 Assert.False(square.Given);
             }
+
+            [Fact]
+            public void Should_set_id()
+            {
+                var square = new Square();
+
+                Assert.NotEqual(Guid.Empty,square.Id);
+            }
         }
 
         public class Value : SquareTests

@@ -17,7 +17,7 @@ namespace SudokuSolverConsole
             {
                 for (var x = 0; x < Width; x++)
                 {
-                    Squares[x,y] = new Square(int.Parse(s[i].ToString()));
+                    Squares[x, y] = new Square(int.Parse(s[i].ToString())){Meta = $"{x},{y}"};
                     i++;
                 }    
             }

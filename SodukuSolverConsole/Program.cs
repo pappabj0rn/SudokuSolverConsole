@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using SudokuSolverConsole.Strategies;
 
 namespace SudokuSolverConsole
 {
@@ -11,8 +12,18 @@ namespace SudokuSolverConsole
         {
             Print(field);
 
-            Console.WriteLine("Press enter to exit.");
-            Console.ReadLine();
+            Console.WriteLine("Press s to solve.");
+
+            var strategy = new CandidateFilterStrategy();
+
+            var input = Console.ReadKey();
+            while (input.Key == ConsoleKey.S)
+            {
+                strategy.TrySolve(field);
+                Console.WriteLine();
+                Print(field);
+                input = Console.ReadKey();
+            }
         }
 
         private static void Print(PlayingField field)

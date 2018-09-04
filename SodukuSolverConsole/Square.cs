@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace SudokuSolverConsole
 {
+    [DebuggerDisplay("{Meta}:{Value}")]
     public class Square
     {
         private int _value;
+
+        public Guid Id { get; set; }
+        public string Meta { get; set; }
 
         public List<int> Candidates { get; set; }
 
@@ -24,6 +29,8 @@ namespace SudokuSolverConsole
 
         public Square(int value = 0)
         {
+            Id = Guid.NewGuid();
+
             if (value < 0 || value > 9)
                 value = 0;
 

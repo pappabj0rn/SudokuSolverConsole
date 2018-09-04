@@ -14,15 +14,20 @@ namespace SudokuSolverConsole.Strategies
             modifiedSquares.AddRange(FilterCandidates(field.GetColumn));
             modifiedSquares.AddRange(FilterCandidates(field.GetBigSquare));
 
-            return modifiedSquares;
+            foreach (var square in modifiedSquares.Where(x=>x.Candidates.Count==1))
+            {
+                square.Value = square.Candidates[0];
+            }
+
+            return modifiedSquares.Distinct().ToList();
         }
 
         private static List<Square> FilterCandidates(Func<int,List<Square>> squareSelector)
         {
             var modifiedSquares = new List<Square>();
-            for (var y = 0; y < PlayingField.Height; y++)
+            for (var i = 0; i < PlayingField.Height; i++)
             {
-                var currentSquares = squareSelector(y);
+                var currentSquares = squareSelector(i);
                 var usedNumbers = currentSquares
                     .Where(x => x.Value > 0)
                     .Select(square => square.Value)
@@ -30,7 +35,7 @@ namespace SudokuSolverConsole.Strategies
 
                 foreach (var number in usedNumbers)
                 {
-                    foreach (var square in currentSquares.Where(x => x.Candidates != null))
+                    foreach (var square in currentSquares.Where(x => x.Value==0))
                     {
                         if (square.Candidates.Remove(number))
                             modifiedSquares.Add(square);
