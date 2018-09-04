@@ -155,6 +155,27 @@ namespace SudokuSolverConsoleTestUnit.Strategies
 
                 Assert.Equal(9,_field.Squares[8,0].Value);
             }
+
+            [Fact]
+            public void Should_itterate_until_done()
+            {
+                var solvableField = new PlayingField("007000069010906040000302000238790100400030020000260030609000000040080507370019000");
+
+                _strategy.TrySolve(solvableField);
+
+                //6,5 will be the last one solved when running the program manually
+                Assert.Equal(9, solvableField.Squares[6, 5].Value);
+            }
+
+            [Fact]
+            public void Should_stop_itterating_when_unable_to_solve()
+            {
+                var solvableField = new PlayingField("007000069010906040000302000238790100400030020000260030609000000040080507300000000");
+
+                _strategy.TrySolve(solvableField);
+
+                Assert.Equal(0, solvableField.Squares[6, 5].Value);
+            }
         }
     }
 }

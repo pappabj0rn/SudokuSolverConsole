@@ -8,23 +8,30 @@ namespace SudokuSolverConsole.Strategies
     {
         public override List<Square> TrySolve(IPlayingField field)
         {
+            var run = true;
             var modifiedSquares = new List<Square>();
 
-            modifiedSquares.AddRange(FilterCandidates(field.GetRow));
-            modifiedSquares.AddRange(FilterCandidates(field.GetColumn));
-            modifiedSquares.AddRange(FilterCandidates(field.GetBigSquare));
-
-            foreach (var square in modifiedSquares.Where(x=>x.Candidates.Count==1))
+            while (run)
             {
-                square.Value = square.Candidates[0];
+                run = false;
+
+                FilterCandidates(field.GetRow, ref run, modifiedSquares);
+                FilterCandidates(field.GetColumn, ref run, modifiedSquares);
+                FilterCandidates(field.GetBigSquare, ref run, modifiedSquares);
+
+                foreach (var square in modifiedSquares.Where(x => x.Candidates.Count == 1)) //todo: && value == 0, but how to test? guess I could extract interface for square and verify 
+                {
+                    square.Value = square.Candidates[0];
+                }
             }
 
             return modifiedSquares.Distinct().ToList();
         }
 
-        private static List<Square> FilterCandidates(Func<int,List<Square>> squareSelector)
+        private static void FilterCandidates(Func<int,List<Square>> squareSelector, ref bool run, List<Square> modifiedSquares)
         {
-            var modifiedSquares = new List<Square>();
+            var currentMods = new List<Square>();
+
             for (var i = 0; i < PlayingField.Height; i++)
             {
                 var currentSquares = squareSelector(i);
@@ -33,17 +40,17 @@ namespace SudokuSolverConsole.Strategies
                     .Select(square => square.Value)
                     .ToList();
 
-                foreach (var number in usedNumbers)
-                {
-                    foreach (var square in currentSquares.Where(x => x.Value==0))
-                    {
-                        if (square.Candidates.Remove(number))
-                            modifiedSquares.Add(square);
-                    }
-                }
+                usedNumbers.ForEach(n => 
+                    currentMods.AddRange(
+                        currentSquares.Where(x => x.Value == 0 && x.Candidates.Remove(n))));
             }
 
-            return modifiedSquares;
+            
+            if (!currentMods.Any())
+                return;
+
+            run = true;
+            modifiedSquares.AddRange(currentMods);
         }
     }
 }
