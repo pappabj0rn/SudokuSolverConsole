@@ -5,7 +5,8 @@ namespace SudokuSolverConsole
 {
     class Program
     {
-        private static PlayingField _field = new PlayingField("007000069010906040000302000238790100400030020000260030609000000040080507370019000");
+        private static PlayingField _field = new PlayingField(
+            "094080002200003010000000905000000006000040730009150000800020094000000500530007000");
 
         static void Main(string[] args)
         {
