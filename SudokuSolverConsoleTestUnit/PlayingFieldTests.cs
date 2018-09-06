@@ -1,3 +1,4 @@
+using Castle.DynamicProxy.Tokens;
 using SudokuSolverConsole;
 using Xunit;
 
@@ -5,28 +6,32 @@ namespace SudokuSolverConsoleTestUnit
 {
     public abstract class PlayingFieldTests
     {
-        private PlayingField field; 
+        protected const string FieldDefinition = "007000069010906040000302000238790100400030020000260030609000000040080507370019000";
+        private IPlayingField _field;
+
+        protected PlayingFieldTests()
+        {
+            _field = new PlayingField(FieldDefinition);
+        }
         public class Constructor : PlayingFieldTests
         {
-            private const string Complete =        "527841369813976245964352871238794156496135728751268934689527413142683597375419682";
-            private const string FieldDefinition = "007000069010906040000302000238790100400030020000260030609000000040080507370019000";
-
+            private const string Complete = "527841369813976245964352871238794156496135728751268934689527413142683597375419682";
             public Constructor()
             {
-                field = new PlayingField(FieldDefinition);
+                _field = new PlayingField(FieldDefinition);
             }
 
             [Fact]
             public void Should_set_square_values_from_input_string()
             {
                 var i = 0;
-                for (var y = 0; y < PlayingField.Width; y++)
+                for (var y = 0; y < PlayingField.GroupCount; y++)
                 {
-                    for (var x = 0; x < PlayingField.Height; x++)
+                    for (var x = 0; x < PlayingField.GroupCount; x++)
                     {
                         Assert.Equal(
                             int.Parse(FieldDefinition[i].ToString()),
-                            field.Squares[x,y].Value);
+                            _field.Squares[x,y].Value);
                         i++;
                     }    
                 }
@@ -35,29 +40,30 @@ namespace SudokuSolverConsoleTestUnit
             [Fact]
             public void Should_set_square_meta_to_x_and_y_coordinates()
             {
-                for (var y = 0; y < PlayingField.Height; y++)
+                for (var y = 0; y < PlayingField.GroupCount; y++)
                 {
-                    for (var x = 0; x < PlayingField.Width; x++)
+                    for (var x = 0; x < PlayingField.GroupCount; x++)
                     {
-                        Assert.Equal($"{x},{y}",field.Squares[x,y].Meta);
+                        Assert.Equal(x,_field.Squares[x,y].Meta["x"]);
+                        Assert.Equal(y,_field.Squares[x,y].Meta["y"]);
                     }
                     
                 }
             }
         }
 
-        public class GetRow : PlayingFieldTests
+        public class GetRow_int : PlayingFieldTests
         {
             private const string FieldDefinition = "123456789111222333000000000000000000000000000000000000000000000000000000000000000";
-            public GetRow()
+            public GetRow_int()
             {
-                field = new PlayingField(FieldDefinition);
+                _field = new PlayingField(FieldDefinition);
             }
 
             [Fact]
             public void Should_return_nine_squares()
             {
-                var row = field.GetRow(0);
+                var row = _field.GetRow(0);
 
                 Assert.Equal(9,row.Count);
             }
@@ -67,7 +73,7 @@ namespace SudokuSolverConsoleTestUnit
             [InlineData(1,"111222333")]
             public void Should_return_squares_from_selected_row(int rowIndex, string expextedValues)
             {
-                var row = field.GetRow(rowIndex);
+                var row = _field.GetRow(rowIndex);
 
                 for (var i = 0; i < row.Count; i++)
                 {
@@ -78,7 +84,7 @@ namespace SudokuSolverConsoleTestUnit
             }
         }
 
-        public class GetColumn : PlayingFieldTests
+        public class GetColumn_int : PlayingFieldTests
         {
             private const string FieldDefinition = "110000000" +
                                                    "210000000" +
@@ -89,15 +95,15 @@ namespace SudokuSolverConsoleTestUnit
                                                    "730000000" +
                                                    "830000000" +
                                                    "930000000";
-            public GetColumn()
+            public GetColumn_int()
             {
-                field = new PlayingField(FieldDefinition);
+                _field = new PlayingField(FieldDefinition);
             }
 
             [Fact]
             public void Should_return_nine_squares()
             {
-                var row = field.GetRow(0);
+                var row = _field.GetRow(0);
 
                 Assert.Equal(9,row.Count);
             }
@@ -107,7 +113,7 @@ namespace SudokuSolverConsoleTestUnit
             [InlineData(1,"111222333")]
             public void Should_return_squares_from_selected_row(int rowIndex, string expextedValues)
             {
-                var row = field.GetColumn(rowIndex);
+                var row = _field.GetColumn(rowIndex);
 
                 for (var i = 0; i < row.Count; i++)
                 {
@@ -118,7 +124,7 @@ namespace SudokuSolverConsoleTestUnit
             }
         }
 
-        public class GetBigSquare : PlayingFieldTests
+        public class GetBigSquare_int : PlayingFieldTests
         {
             private const string FieldDefinition = "123111000" +
                                                    "456222000" +
@@ -129,15 +135,15 @@ namespace SudokuSolverConsoleTestUnit
                                                    "000000999" +
                                                    "000000999" +
                                                    "000000999";
-            public GetBigSquare()
+            public GetBigSquare_int()
             {
-                field = new PlayingField(FieldDefinition);
+                _field = new PlayingField(FieldDefinition);
             }
 
             [Fact]
             public void Should_return_nine_squares()
             {
-                var row = field.GetBigSquare(0);
+                var row = _field.GetBigSquare(0);
 
                 Assert.Equal(9,row.Count);
             }
@@ -148,7 +154,7 @@ namespace SudokuSolverConsoleTestUnit
             [InlineData(8,"999999999")]
             public void Should_return_squares_from_selected_row(int rowIndex, string expextedValues)
             {
-                var row = field.GetBigSquare(rowIndex);
+                var row = _field.GetBigSquare(rowIndex);
 
                 for (var i = 0; i < row.Count; i++)
                 {
@@ -156,6 +162,68 @@ namespace SudokuSolverConsoleTestUnit
                         int.Parse(expextedValues[i].ToString()),
                         row[i].Value);
                 }
+            }
+        }
+
+        public class ToString : PlayingFieldTests
+        {
+            [Fact]
+            public void Should_return_given_constructor_string_after_construction()
+            {
+                _field = new PlayingField(FieldDefinition);
+                var str = _field.ToString();
+
+                Assert.Equal(FieldDefinition, str);
+            }
+        }
+
+        public class GetRow_square : PlayingFieldTests
+        {
+            [Theory]
+            [InlineData(1,0,0)]
+            [InlineData(0,1,1)]
+            [InlineData(0,3,3)]
+            [InlineData(6,5,5)]
+            public void Should_return_correct_row_for_square(int x, int y, int expected)
+            {
+                var group = _field.GetRow(expected);
+                var squares = _field.GetRow(_field.Squares[x, y]);
+                
+                Assert.Equal(group, squares);
+            }
+        }
+
+        public class GetColumn_square : PlayingFieldTests
+        {
+            [Theory]
+            [InlineData(0,1,0)]
+            [InlineData(1,2,1)]
+            [InlineData(3,0,3)]
+            [InlineData(5,7,5)]
+            public void Should_return_correct_column_for_square(int x, int y, int expected)
+            {
+                var group = _field.GetColumn(expected);
+                var squares = _field.GetColumn(_field.Squares[x, y]);
+                
+                Assert.Equal(group, squares);
+            }
+        }
+
+        public class GetBigSquare_square : PlayingFieldTests
+        {
+            [Theory]
+            [InlineData(0,1,0)]
+            [InlineData(1,2,0)]
+            [InlineData(3,0,1)]
+            [InlineData(5,1,1)]
+            [InlineData(4,5,4)]
+            [InlineData(5,3,4)]
+            public void Should_return_correct_big_square_for_square(int x, int y, int expected)
+            {
+                var group = _field.GetBigSquare(expected);
+                var squares = _field.GetBigSquare(_field.Squares[x, y]);
+                
+                Assert.Equal(group, squares);
             }
         }
     }

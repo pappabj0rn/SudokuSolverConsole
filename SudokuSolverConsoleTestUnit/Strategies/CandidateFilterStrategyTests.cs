@@ -7,79 +7,54 @@ using Xunit;
 
 namespace SudokuSolverConsoleTestUnit.Strategies
 {
-    public abstract class CandidateFilterStrategyTests
+    public abstract class CandidateFilterStrategyTests : StrategyTestsBase
     {
-        protected Mock<IPlayingField> _fieldMock = new Mock<IPlayingField>();
-        protected IPlayingField _field = new PlayingField("000000000" +
-                                                          "000000000" +
-                                                          "000000000" +
-                                                          "000000000" +
-                                                          "000000000" +
-                                                          "000000000" +
-                                                          "000000000" +
-                                                          "000000000" +
-                                                          "000000000");
-        
-        protected CandidateFilterStrategy _strategy = new CandidateFilterStrategy();
-
-        protected CandidateFilterStrategyTests()
-        {
-            _fieldMock.Setup(x => x.GetRow(It.IsAny<int>()))
-                .Returns((int i) => _field.GetRow(i));
-
-            _fieldMock.Setup(x => x.GetColumn(It.IsAny<int>()))
-                .Returns((int i) => _field.GetColumn(i));
-
-            _fieldMock.Setup(x => x.GetBigSquare(It.IsAny<int>()))
-                .Returns((int i) => _field.GetBigSquare(i));
-        }
+        private readonly SolvingStrategy _strategy = new CandidateFilterStrategy();
 
         public class TrySolve : CandidateFilterStrategyTests
         {
-            private static readonly List<int> CountNine = new List<int>{0,1,2,3,4,5,6,7,8};
-
             [Fact]
             public void Should_get_rows_from_field()
             {
-                _strategy.TrySolve(_fieldMock.Object);
+                _strategy.TrySolve(FieldMock.Object);
 
                 foreach (var i in CountNine)
                 {
-                    _fieldMock.Verify(x => x.GetRow(i), Times.Once);
+                    FieldMock.Verify(x => x.GetRow(i), Times.Once);
                 }
             }
 
             [Fact]
             public void Should_get_columns_from_field()
             {
-                _strategy.TrySolve(_fieldMock.Object);
+                _strategy.TrySolve(FieldMock.Object);
 
                 foreach (var i in CountNine)
                 {
-                    _fieldMock.Verify(x => x.GetColumn(i), Times.Once);
+                    FieldMock.Verify(x => x.GetColumn(i), Times.Once);
                 }
             }
 
             [Fact]
             public void Should_get_bigsquare_from_field()
             {
-                _strategy.TrySolve(_fieldMock.Object);
+                _strategy.TrySolve(FieldMock.Object);
 
                 foreach (var i in CountNine)
                 {
-                    _fieldMock.Verify(x => x.GetBigSquare(i), Times.Once);
+                    FieldMock.Verify(x => x.GetBigSquare(i), Times.Once);
                 }
             }
 
             [Fact]
             public void Should_remove_set_values_from_cadidate_lists_in_row()
             {
-                _field.Squares[0,0].Value = 1;
-                _field.Squares[5,0].Value = 3;
+                Field.Squares[0,0].Value = 1;
+                Field.Squares[5,0].Value = 3;
 
-                _strategy.TrySolve(_fieldMock.Object);
+                _strategy.TrySolve(FieldMock.Object);
                 
-                foreach (var square in _field.GetRow(0).Where(x=>x.Value==0))
+                foreach (var square in Field.GetRow(0).Where(x=>x.Value==0))
                 {
                     Assert.DoesNotContain(1, square.Candidates);
                     Assert.DoesNotContain(3, square.Candidates);
@@ -89,12 +64,12 @@ namespace SudokuSolverConsoleTestUnit.Strategies
             [Fact]
             public void Should_remove_set_values_from_cadidate_lists_in_column()
             {
-                _field.Squares[0,0].Value = 1;
-                _field.Squares[0,1].Value = 3;
+                Field.Squares[0,0].Value = 1;
+                Field.Squares[0,1].Value = 3;
 
-                _strategy.TrySolve(_fieldMock.Object);
+                _strategy.TrySolve(FieldMock.Object);
 
-                foreach (var square in _field.GetColumn(0).Where(x=>x.Value==0))
+                foreach (var square in Field.GetColumn(0).Where(x=>x.Value==0))
                 {
                     Assert.DoesNotContain(1, square.Candidates);
                     Assert.DoesNotContain(3, square.Candidates);
@@ -104,14 +79,14 @@ namespace SudokuSolverConsoleTestUnit.Strategies
             [Fact]
             public void Should_remove_set_values_from_cadidate_lists_in_big_square()
             {
-                _field.Squares[0,0].Value = 1;
-                _field.Squares[0,1].Value = 3;
-                _field.Squares[2,2].Value = 5;
+                Field.Squares[0,0].Value = 1;
+                Field.Squares[0,1].Value = 3;
+                Field.Squares[2,2].Value = 5;
 
 
-                _strategy.TrySolve(_fieldMock.Object);
+                _strategy.TrySolve(FieldMock.Object);
 
-                foreach (var square in _field.GetBigSquare(0).Where(x=>x.Value==0))
+                foreach (var square in Field.GetBigSquare(0).Where(x=>x.Value==0))
                 {
                     Assert.DoesNotContain(5, square.Candidates);
                 }
@@ -120,24 +95,29 @@ namespace SudokuSolverConsoleTestUnit.Strategies
             [Fact]
             public void Should_return_squares_that_have_had_candidates_removed()
             {
-                _field.Squares[0,0].Value = 1;
-                _field.Squares[0,1].Value = 3;
-                _field.Squares[2,2].Value = 5;
+                Field.Squares[0,0].Value = 1;
+                Field.Squares[0,1].Value = 3;
+                Field.Squares[2,2].Value = 5;
 
                 var expectedSquares = new List<Square>();
-                expectedSquares.AddRange(_field.GetRow(0));
-                expectedSquares.AddRange(_field.GetRow(1));
-                expectedSquares.AddRange(_field.GetRow(2));
-                expectedSquares.AddRange(_field.GetColumn(0));
-                expectedSquares.AddRange(_field.GetColumn(2));
-                expectedSquares.AddRange(_field.GetBigSquare(0));
-                expectedSquares.RemoveAll(x => x.Id == _field.Squares[0,0].Id);
-                expectedSquares.RemoveAll(x => x.Id == _field.Squares[0,1].Id);
-                expectedSquares.RemoveAll(x => x.Id == _field.Squares[2,2].Id);
-                expectedSquares = expectedSquares.Distinct().OrderBy(s => s.Meta).ToList();
+                expectedSquares.AddRange(Field.GetRow(0));
+                expectedSquares.AddRange(Field.GetRow(1));
+                expectedSquares.AddRange(Field.GetRow(2));
+                expectedSquares.AddRange(Field.GetColumn(0));
+                expectedSquares.AddRange(Field.GetColumn(2));
+                expectedSquares.AddRange(Field.GetBigSquare(0));
+                expectedSquares.RemoveAll(x => x.Id == Field.Squares[0,0].Id);
+                expectedSquares.RemoveAll(x => x.Id == Field.Squares[0,1].Id);
+                expectedSquares.RemoveAll(x => x.Id == Field.Squares[2,2].Id);
+                expectedSquares = expectedSquares
+                    .Distinct()
+                    .OrderBy(s => (int)s.Meta[Square.Keys.X])
+                    .ThenBy(s => (int)s.Meta[Square.Keys.Y])
+                    .ToList();
                 
-                var modSquares = _strategy.TrySolve(_fieldMock.Object)
-                    .OrderBy(s => s.Meta)
+                var modSquares = _strategy.TrySolve(FieldMock.Object)
+                    .OrderBy(s => (int)s.Meta[Square.Keys.X])
+                    .ThenBy(s => (int)s.Meta[Square.Keys.Y])
                     .ToList();
 
                 Assert.Equal(expectedSquares,modSquares);
@@ -148,12 +128,12 @@ namespace SudokuSolverConsoleTestUnit.Strategies
             {
                 for (var i = 0; i < 8; i++) // skip last square in row
                 {
-                    _field.Squares[i,0].Value = i+1;
+                    Field.Squares[i,0].Value = i+1;
                 }
 
-                _strategy.TrySolve(_fieldMock.Object);
+                _strategy.TrySolve(FieldMock.Object);
 
-                Assert.Equal(9,_field.Squares[8,0].Value);
+                Assert.Equal(9,Field.Squares[8,0].Value);
             }
 
             [Fact]

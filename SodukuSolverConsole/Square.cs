@@ -7,10 +7,16 @@ namespace SudokuSolverConsole
     [DebuggerDisplay("{Meta}:{Value}")]
     public class Square
     {
+        public abstract class Keys
+        {
+            public const string X = "x";
+            public const string Y = "y";
+        }
+
         private int _value;
 
         public Guid Id { get; set; }
-        public string Meta { get; set; }
+        public Dictionary<string,object> Meta { get; set; }
 
         public List<int> Candidates { get; set; }
 
@@ -30,6 +36,7 @@ namespace SudokuSolverConsole
         public Square(int value = 0)
         {
             Id = Guid.NewGuid();
+            Meta = new Dictionary<string, object>();
 
             if (value < 0 || value > 9)
                 value = 0;

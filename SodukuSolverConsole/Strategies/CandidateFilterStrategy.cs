@@ -32,7 +32,7 @@ namespace SudokuSolverConsole.Strategies
         {
             var currentMods = new List<Square>();
 
-            for (var i = 0; i < PlayingField.Height; i++)
+            for (var i = 0; i < PlayingField.GroupCount; i++)
             {
                 var currentSquares = squareSelector(i);
                 var usedNumbers = currentSquares

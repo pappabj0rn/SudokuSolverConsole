@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Linq;
 using SudokuSolverConsole.Strategies;
 
 namespace SudokuSolverConsole
 {
     class Program
     {
-        private static PlayingField _field = new PlayingField(
-            "094080002200003010000000905000000006000040730009150000800020094000000500530007000");
+        private static PlayingField _field = new PlayingField("000801059207900304100302007060013000038060091020408000005720600000005103000000000");
 
         static void Main(string[] args)
         {
@@ -34,12 +34,31 @@ namespace SudokuSolverConsole
             if(fieldStr.Length==81)
                 _field = new PlayingField(fieldStr);
 
-            var strategy = new CandidateFilterStrategy();
+            var cfStrategy = new CandidateFilterStrategy();
+            var spStrategy = new SinglePositionStrategy();
 
+            Console.WriteLine("Solving field:");
+            Console.WriteLine(_field.ToString());
 
-            strategy.TrySolve(_field);
+            var run = true;
+            while (run)
+            {
+                run = cfStrategy.TrySolve(_field).Any() 
+                      || spStrategy.TrySolve(_field).Any();
+            }
+            
             Console.WriteLine();
             PrintField();
+
+            var foundZeroCandidated = false;
+            foreach (var sqr in _field.Squares)
+            {
+                if(sqr.Value == 0)
+                    foundZeroCandidated = true;
+            }
+
+            if(foundZeroCandidated)
+                Console.WriteLine("I've gone goofed!");
 
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
@@ -54,7 +73,7 @@ namespace SudokuSolverConsole
 
             Console.WriteLine(borderTop);  
 
-            for (var y = 0; y < PlayingField.Height; y++)
+            for (var y = 0; y < PlayingField.GroupCount; y++)
             {
                 if(y>0 && y%3==0)
                     Console.WriteLine(borderMiddle);
@@ -87,7 +106,6 @@ namespace SudokuSolverConsole
                     Console.Write(rowSquares[k].Value == 0
                         ? " "
                         : rowSquares[k].Value.ToString());
-
                 }
 
                 Console.ForegroundColor = ConsoleColor.White;
